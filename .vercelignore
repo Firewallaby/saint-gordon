@@ -1,0 +1,9 @@
+.DS_Store
+*.zip
+.update-backups
+.sites-runtime
+.git
+.github
+tests
+scripts
+Update Music.command

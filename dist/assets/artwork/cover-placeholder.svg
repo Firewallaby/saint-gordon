@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1000" viewBox="0 0 1000 1000">
+  <rect width="1000" height="1000" fill="#171717"/>
+  <g fill="none" stroke="#777" stroke-width="2">
+    <path d="M35 90V35h55M910 35h55v55M965 910v55h-55M90 965H35v-55"/>
+    <circle cx="500" cy="450" r="260"/><circle cx="500" cy="450" r="210"/>
+    <circle cx="500" cy="450" r="80"/><circle cx="500" cy="450" r="12"/>
+    <path d="M190 450h620M500 140v620"/>
+  </g>
+  <g fill="#eee" font-family="Arial,Helvetica,sans-serif" font-weight="700">
+    <text x="70" y="120" font-size="27" letter-spacing="4">SAINT GORDON COLLECTIVE</text>
+    <text x="70" y="845" font-size="64">SOUND FIRST.</text>
+    <text x="73" y="897" font-size="22" letter-spacing="3">COVER ART TO FOLLOW</text>
+  </g>
+</svg>

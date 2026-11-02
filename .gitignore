@@ -1,0 +1,9 @@
+.DS_Store
+*.zip
+.sites-runtime/
+.update-backups/
+.vercel
+.openai/
+node_modules/
+__pycache__/
+*.pyc
