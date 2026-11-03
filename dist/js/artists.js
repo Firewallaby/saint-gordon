@@ -93,7 +93,7 @@ window.SAINT_ARTISTS = {
       links: [
         {
           label: "Instagram",
-          url: "",
+          url: "https://www.instagram.com/dxkotavio1et/",
         },
       ],
     },

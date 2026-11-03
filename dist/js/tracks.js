@@ -52,14 +52,15 @@ window.SAINT_TRACKS = [
     "artworkPlaceholder": false,
     "artworkAlt": "Cover artwork for WONDERLAND by M0NIQUE and Saint Gordon",
     "releaseDate": "",
-    "summary": "Artists or aspiring artists, especially from Adelaide DM me on Soundcloud for free mixing 🖤\n\nAnything & Everything."
+    "summary": "An atmospheric, hypnotic collaboration between Saint Gordon and M0NIQUE, blending dark late-night textures with raw emotional cadence.",
+    "meaning": "WONDERLAND explores escapism, intoxication, and the haze of losing yourself in someone else when reality becomes too heavy. It captures that surreal drift between euphoria and emotional numbness in the dead of night."
   },
   {
     "slug": "overdose",
     "title": "OVERDOSE (Feat. Saint Gordon)",
     "artist": "Saint Gordon",
     "artistCredits": ["M0NIQUE", "Saint Gordon"],
-    "soundcloudUrl": "https://api.soundcloud.com/tracks/2422691649",
+    "soundcloudUrl": "https://soundcloud.com/ceannairefr/overdose",
     "soundcloudId": 2422691649,
     "spotifyUrl": "https://open.spotify.com/artist/5MkDcYOhfIerJyO3Woykxy",
     "appleMusicUrl": "https://music.apple.com/us/artist/saint-gordon/6818967036",
@@ -68,14 +69,15 @@ window.SAINT_TRACKS = [
     "artworkPlaceholder": false,
     "artworkAlt": "Cover artwork for OVERDOSE",
     "releaseDate": "",
-    "summary": ""
+    "summary": "A visceral, brooding collaboration confronting emotional intensity, excess, and sensory overload.",
+    "meaning": "OVERDOSE is about pushing past your limits until everything blurs together. It deals with reaching an emotional breaking point where coping mechanisms, strained relationships, and exhaustion collide."
   },
   {
     "slug": "robbed",
     "title": "ROBBED",
     "artist": "Saint Gordon",
     "artistCredits": ["M0NIQUE", "Saint Gordon"],
-    "soundcloudUrl": "https://api.soundcloud.com/tracks/2421019929",
+    "soundcloudUrl": "https://soundcloud.com/ceannairefr/yourobbedmeofmymother",
     "soundcloudId": 2421019929,
     "spotifyUrl": "https://open.spotify.com/artist/5MkDcYOhfIerJyO3Woykxy",
     "appleMusicUrl": "https://music.apple.com/us/artist/saint-gordon/6818967036",
@@ -84,14 +86,15 @@ window.SAINT_TRACKS = [
     "artworkPlaceholder": false,
     "artworkAlt": "Cover artwork for ROBBED",
     "releaseDate": "",
-    "summary": ""
+    "summary": "A stark, haunting reflection on profound personal loss, grief, and emotional betrayal.",
+    "meaning": "ROBBED confronts the devastating aftermath of having something irreplaceable torn away from your world. The song captures the raw fury, emptiness, and heavy silence left in the wake of deep personal loss."
   },
   {
     "slug": "manic-monique",
     "title": "MANIC MONIQUE",
     "artist": "Saint Gordon",
     "artistCredits": ["M0NIQUE"],
-    "soundcloudUrl": "https://api.soundcloud.com/tracks/2421019500",
+    "soundcloudUrl": "https://soundcloud.com/ceannairefr/canyoutellimmanic",
     "soundcloudId": 2421019500,
     "spotifyUrl": "https://open.spotify.com/artist/0OCl8WjnfhsVpl8VOjyAgB",
     "appleMusicUrl": "https://music.apple.com/us/artist/m0nique/6818966772",
@@ -100,14 +103,15 @@ window.SAINT_TRACKS = [
     "artworkPlaceholder": false,
     "artworkAlt": "Cover artwork for MANIC MONIQUE",
     "releaseDate": "",
-    "summary": ""
+    "summary": "An electric, raw track navigating the volatile highs and sudden crashes of manic energy.",
+    "meaning": "MANIC MONIQUE channels the unfiltered rush of racing thoughts, erratic euphoria, and hyperactive vulnerability. It leaves the raw edges exposed, mirroring how overwhelming a manic episode feels from the inside."
   },
   {
     "slug": "post",
     "title": "POST",
     "artist": "Saint Gordon",
     "artistCredits": ["Saint Gordon"],
-    "soundcloudUrl": "https://api.soundcloud.com/tracks/2420469576",
+    "soundcloudUrl": "https://soundcloud.com/ceannairefr/post",
     "soundcloudId": 2420469576,
     "spotifyUrl": "https://open.spotify.com/artist/5MkDcYOhfIerJyO3Woykxy",
     "appleMusicUrl": "https://music.apple.com/us/artist/saint-gordon/6818967036",
@@ -116,14 +120,15 @@ window.SAINT_TRACKS = [
     "artworkPlaceholder": false,
     "artworkAlt": "Cover artwork for POST",
     "releaseDate": "",
-    "summary": "After having this sit for like 2+ years in my iCloud. It deserves some love. Even if I couldn't mix or record for shit back then."
+    "summary": "An unvarnished vault cut reflecting on distance, nostalgic isolation, and words left behind.",
+    "meaning": "POST is a reflective piece about looking back at older versions of yourself, unresolved conversations, and the emotional distance that builds between people over time."
   },
   {
     "slug": "wasted",
     "title": "Wasted",
     "artist": "Saint Gordon",
     "artistCredits": ["Saint Gordon"],
-    "soundcloudUrl": "https://api.soundcloud.com/tracks/2419032495",
+    "soundcloudUrl": "https://soundcloud.com/ceannairefr/wasted",
     "soundcloudId": 2419032495,
     "spotifyUrl": "https://open.spotify.com/artist/5MkDcYOhfIerJyO3Woykxy",
     "appleMusicUrl": "https://music.apple.com/us/artist/saint-gordon/6818967036",
@@ -132,14 +137,15 @@ window.SAINT_TRACKS = [
     "artworkPlaceholder": false,
     "artworkAlt": "Cover artwork for Wasted",
     "releaseDate": "",
-    "summary": "A few year old song being added to the vault collection. Wanted to use the song to show progress and how far these boys have come and how far my mixes have come."
+    "summary": "A hazy, bass-driven vault track capturing late-night reckless indulgence.",
+    "meaning": "WASTED captures the reckless blur of using nights out to numb what you can't fix during the day. It sits in that uneasy space between having fun and spiraling out of control."
   },
   {
     "slug": "101s",
     "title": "101's",
     "artist": "Saint Gordon",
     "artistCredits": ["King Kayy", "Saint Gordon"],
-    "soundcloudUrl": "https://api.soundcloud.com/tracks/2418999150",
+    "soundcloudUrl": "https://soundcloud.com/ceannairefr/oneohones",
     "soundcloudId": 2418999150,
     "spotifyUrl": "https://open.spotify.com/artist/5MkDcYOhfIerJyO3Woykxy",
     "appleMusicUrl": "https://music.apple.com/us/artist/saint-gordon/6818967036",
@@ -148,14 +154,15 @@ window.SAINT_TRACKS = [
     "artworkPlaceholder": false,
     "artworkAlt": "Cover artwork for 101's",
     "releaseDate": "",
-    "summary": "I can't lie, It took me so long to get a decent mix for this. King's voice is too deep for his own good 😂"
+    "summary": "Gritty underground energy anchored by King Kayy's low, resonant cadence.",
+    "meaning": "101's is built around perseverance, street instincts, and standing your ground through turbulent seasons. It highlights the raw vocal synergy and loyalty between longtime collaborators."
   },
   {
     "slug": "feeling-fine-ghost",
     "title": "Feeling Fine/Ghost",
     "artist": "Saint Gordon",
     "artistCredits": ["Saint Gordon"],
-    "soundcloudUrl": "https://api.soundcloud.com/tracks/2418999642",
+    "soundcloudUrl": "https://soundcloud.com/ceannairefr/feelingfineintheghost",
     "soundcloudId": 2418999642,
     "spotifyUrl": "https://open.spotify.com/artist/5MkDcYOhfIerJyO3Woykxy",
     "appleMusicUrl": "https://music.apple.com/us/artist/saint-gordon/6818967036",
@@ -164,14 +171,15 @@ window.SAINT_TRACKS = [
     "artworkPlaceholder": false,
     "artworkAlt": "Cover artwork for Feeling Fine/Ghost",
     "releaseDate": "",
-    "summary": "Mixed while drunk after a night out. Found in the vault. Time to let the world hear now."
+    "summary": "A contrasting dual-piece capturing surface-level composure alongside hollow internal isolation.",
+    "meaning": "FEELING FINE / GHOST explores the dissonance between telling everyone around you that you're fine while secretly feeling like a ghost floating through your own life."
   },
   {
     "slug": "sideline",
     "title": "SIDELINE",
     "artist": "Saint Gordon",
     "artistCredits": ["Saint Gordon"],
-    "soundcloudUrl": "https://api.soundcloud.com/tracks/2418873861",
+    "soundcloudUrl": "https://soundcloud.com/ceannairefr/sideline",
     "soundcloudId": 2418873861,
     "spotifyUrl": "https://open.spotify.com/artist/5MkDcYOhfIerJyO3Woykxy",
     "appleMusicUrl": "https://music.apple.com/us/artist/saint-gordon/6818967036",
@@ -180,14 +188,15 @@ window.SAINT_TRACKS = [
     "artworkPlaceholder": false,
     "artworkAlt": "Cover artwork for SIDELINE",
     "releaseDate": "",
-    "summary": ""
+    "summary": "A bitter, introspective track about being relegated to second choice.",
+    "meaning": "SIDELINE deals with the quiet frustration of watching someone you care about treat you as an afterthought. It's about recognizing when you're being kept on the sidelines and deciding you're done waiting."
   },
   {
     "slug": "benzo-baby",
     "title": "BENZO BABY",
     "artist": "Saint Gordon",
     "artistCredits": ["Saint Gordon"],
-    "soundcloudUrl": "https://api.soundcloud.com/tracks/2416726782",
+    "soundcloudUrl": "https://soundcloud.com/ceannairefr/benzobaby",
     "soundcloudId": 2416726782,
     "spotifyUrl": "https://open.spotify.com/artist/5MkDcYOhfIerJyO3Woykxy",
     "appleMusicUrl": "https://music.apple.com/us/artist/saint-gordon/6818967036",
@@ -196,14 +205,15 @@ window.SAINT_TRACKS = [
     "artworkPlaceholder": false,
     "artworkAlt": "Cover artwork for BENZO BABY",
     "releaseDate": "",
-    "summary": ""
+    "summary": "A slow-burning, somber reflection on chemical detachment and mental fragility.",
+    "meaning": "BENZO BABY delves into chemical comfort and the delicate, dangerous line between temporary relief and deeper dependency when trying to quiet a racing mind."
   },
   {
     "slug": "live-with-memories-for-me",
     "title": "Live With Memories For Me",
     "artist": "Saint Gordon",
     "artistCredits": ["Saint Gordon"],
-    "soundcloudUrl": "https://api.soundcloud.com/tracks/2416555170",
+    "soundcloudUrl": "https://soundcloud.com/ceannairefr/opa",
     "soundcloudId": 2416555170,
     "spotifyUrl": "https://open.spotify.com/artist/5MkDcYOhfIerJyO3Woykxy",
     "appleMusicUrl": "https://music.apple.com/us/artist/saint-gordon/6818967036",
@@ -212,7 +222,8 @@ window.SAINT_TRACKS = [
     "artworkPlaceholder": false,
     "artworkAlt": "Cover artwork for Live With Memories For Me",
     "releaseDate": "",
-    "summary": ""
+    "summary": "A tender, melancholic tribute on grief, memory, and carrying lost souls forward.",
+    "meaning": "LIVE WITH MEMORIES FOR ME is a deeply personal dedication to those who are no longer here. It wrestles with surviving loss, preserving shared moments, and honoring the departed by keeping their presence alive."
   },
   {
     "slug": "letmebleed",
@@ -223,7 +234,8 @@ window.SAINT_TRACKS = [
     "artwork": "assets/artwork/cover-placeholder.svg",
     "artworkPlaceholder": true,
     "releaseDate": "",
-    "summary": "",
+    "summary": "A raw, stripped-back cover paying homage to Lil Peep's defining emo-rap sound.",
+    "meaning": "This cover honors Lil Peep's uncompromising vulnerability, exploring self-destruction, desperate longing, and emotional exposure with unvarnished passion.",
     "production": "I made this song to practice manually tuning vocals. I was still teaching my ear what sounded natural and what sounded overdone. If the vocals sound strange, that's the work in progress you can hear.",
     "story": "Dakota had good vocals; the part I hadn't learned yet was how to tune them without making them sound strange. The performance was already there. I was still learning how to bring it out."
   },

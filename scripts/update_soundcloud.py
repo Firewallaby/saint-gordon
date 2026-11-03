@@ -115,14 +115,17 @@ def build():
             raise ValueError('A track title is missing; import stopped.')
         local = next((t for t in all_saved if t.get('soundcloudId') == track_id or (item.get('permalink_url') and t.get('soundcloudUrl') == item['permalink_url']) or ' '.join(t.get('title', '').casefold().split()) == ' '.join(title.casefold().split())), {})
         track = dict(local)
+        raw_desc = public.get('description') or ''
+        is_promo = any(w in raw_desc.lower() for w in ['dm me', 'free mixing', 'aspiring artists', 'saint gordon has always been'])
+        clean_desc = '' if is_promo else raw_desc
         track.update(slug=local.get('slug') or 'soundcloud-' + str(track_id), title=title,
                      artist=public['author_name'], soundcloudId=track_id,
-                     soundcloudUrl=item.get('permalink_url') or local.get('soundcloudUrl') or embed_url,
-                     summary=public.get('description') or 'From the Saint Gordon Collective playlist.',
-                     artistCredits=infer_artist_credits(title, public.get('description') or '', local),
+                     soundcloudUrl=item.get('permalink_url') or (local.get('soundcloudUrl') if local.get('soundcloudUrl') and not local.get('soundcloudUrl').startswith('https://api.soundcloud.com/') else None) or embed_url,
+                     summary=clean_desc or local.get('summary') or 'From the Saint Gordon Collective playlist.',
+                     artistCredits=infer_artist_credits(title, clean_desc or local.get('summary') or '', local),
                      placeholder=False, type='SoundCloud track')
         if not track.get('meaning') or 'not been supplied' in track.get('meaning', ''):
-            track['meaning'] = public.get('description') or ''
+            track['meaning'] = clean_desc or local.get('meaning') or ''
         if item.get('release_date'):
             track['releaseDate'] = item['release_date'][:10]
         # Prefer deliberately supplied local artwork; otherwise refresh oEmbed art.

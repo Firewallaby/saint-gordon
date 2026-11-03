@@ -335,18 +335,6 @@ button {
   width: 100%;
   aspect-ratio: 1;
 }
-.feature-art:before {
-  content: "ARCHIVAL COPY";
-  position: absolute;
-  top: -12px;
-  left: 24px;
-  background: #f2f2f2;
-  color: #101010;
-  padding: 3px 12px;
-  font:
-    12px "Courier New",
-    monospace;
-}
 .feature h3 {
   font:
     clamp(2.3rem, 4.5vw, 4.4rem) "Engravers Old English",
@@ -687,26 +675,68 @@ footer {
   display: grid;
   grid-template-columns: repeat(40, minmax(0, 1fr));
   align-items: center;
-  gap: 2px;
+  gap: 3px;
   width: 100%;
-  height: 24px;
-  margin: 14px 0 18px;
+  height: 52px;
+  margin: 16px 0 18px;
+  padding: 8px 12px;
+  box-sizing: border-box;
+  background: #0a0a0a;
+  border: 1px solid #383838;
+  border-radius: 4px;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.7);
   overflow: hidden;
+  cursor: pointer;
+  position: relative;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.player-spectrum:hover {
+  border-color: #707070;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.08);
+}
+.player-spectrum::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  pointer-events: none;
 }
 .player-spectrum i {
   display: block;
   width: 100%;
   height: var(--bar-height);
-  background: #f2f2f2;
+  min-height: 4px;
+  background: linear-gradient(180deg, #b0b0b0 0%, #707070 50%, #444444 100%);
+  border-radius: 999px;
+  transition: height 0.15s ease-out, background 0.2s ease, box-shadow 0.2s ease;
+  transform-origin: center;
+}
+.player-spectrum i.is-past {
+  background: linear-gradient(180deg, #ffffff 0%, #d8d8d8 50%, #909090 100%);
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.45);
 }
 .is-playing .player-spectrum i {
-  animation: player-spectrum-pulse 680ms steps(2, end) infinite alternate;
+  animation: player-spectrum-wave 920ms cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
   animation-delay: var(--bar-delay);
 }
-@keyframes player-spectrum-pulse {
-  to {
-    transform: scaleY(0.2);
-    opacity: 0.65;
+.is-playing .player-spectrum i.is-past {
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
+}
+@keyframes player-spectrum-wave {
+  0% {
+    transform: scaleY(0.4);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scaleY(1.05);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleY(0.65);
+    opacity: 0.85;
   }
 }
 .play-button {
@@ -774,15 +804,15 @@ footer {
 }
 .player-source,
 .player-fallback {
-  position: fixed;
+  position: absolute;
   top: 0;
-  left: -10000px;
-  width: 320px !important;
-  height: 166px !important;
-  margin: 0 !important;
+  left: 0;
+  width: 100%;
+  height: 100%;
   border: 0;
-  opacity: 0;
+  opacity: 0.0001;
   pointer-events: none;
+  z-index: -1;
 }
 .player .attribution {
   font-size: 12px;
@@ -1982,3 +2012,355 @@ h3,
 .collaboration-contact h2 { margin-bottom: 24px; }
 .collaboration-actions { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 24px; }
 @media (max-width: 700px) { .collaboration-services { grid-template-columns: 1fr; gap: 24px; margin: 36px 0; } }
+
+/* Collaboration Expanded: Transmission Protocol & FAQ */
+.collab-section {
+  margin: 64px 0;
+  border-top: 1px solid #101010;
+  padding-top: 36px;
+}
+.collab-section h2 {
+  font-size: clamp(2rem, 3.8vw, 3.2rem);
+  margin: 12px 0 16px;
+}
+.collab-subhead {
+  color: #555555;
+  max-width: 680px;
+  margin-bottom: 32px;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+.section-badge {
+  display: inline-block;
+  background: #101010;
+  color: #f2f2f2;
+  padding: 3px 10px;
+  letter-spacing: 0.1em;
+  font-family: "Courier New", monospace;
+  font-size: 11px;
+}
+.collab-steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+  margin-top: 28px;
+}
+.collab-step {
+  border: 1px solid #101010;
+  background: #fafafa;
+  padding: 24px 20px;
+  position: relative;
+  box-shadow: 4px 4px 0 #101010;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.collab-step:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 #101010;
+}
+.collab-step .step-num {
+  display: inline-block;
+  font: 700 13px "Courier New", monospace;
+  color: #888888;
+  margin-bottom: 12px;
+}
+.collab-step h3 {
+  font-size: 1.25rem;
+  margin: 0 0 12px;
+  line-height: 1.3;
+}
+.collab-step p {
+  color: #444444;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0;
+}
+.collab-faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 28px;
+  max-width: 840px;
+}
+.collab-faq-item {
+  border: 1px solid #101010;
+  background: #ffffff;
+  padding: 16px 20px;
+  box-shadow: 3px 3px 0 #10101022;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+.collab-faq-item[open] {
+  background: #fafafa;
+  box-shadow: 4px 4px 0 #101010;
+}
+.collab-faq-item summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  font-size: 1.05rem;
+  user-select: none;
+  list-style: none;
+}
+.collab-faq-item summary::-webkit-details-marker {
+  display: none;
+}
+.collab-faq-item summary strong {
+  font-weight: 600;
+  padding-right: 16px;
+  line-height: 1.4;
+}
+.collab-faq-item .faq-icon {
+  font: 700 18px "Courier New", monospace;
+  transition: transform 0.2s ease;
+  line-height: 1;
+}
+.collab-faq-item[open] .faq-icon {
+  transform: rotate(45deg);
+}
+.collab-faq-item p {
+  margin: 14px 0 4px;
+  color: #333333;
+  line-height: 1.65;
+  font-size: 0.95rem;
+  border-top: 1px dashed #cccccc;
+  padding-top: 12px;
+}
+.collab-faq-item code {
+  font-family: "Courier New", monospace;
+  background: #e8e8e8;
+  padding: 2px 6px;
+  font-size: 0.85em;
+  border: 1px solid #cccccc;
+}
+
+/* =========================================================
+   Cathode Ray / "Relic Mode" Oscilloscope Visualizer
+   ========================================================= */
+.deck-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.relic-mode-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: #111111;
+  border: 1px solid #505050;
+  color: #cccccc;
+  font: 700 11px "Courier New", monospace;
+  padding: 3px 9px;
+  cursor: pointer;
+  border-radius: 2px;
+  letter-spacing: 0.08em;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+.relic-mode-btn:hover {
+  border-color: #888888;
+  color: #ffffff;
+}
+.relic-led {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #333333;
+  border: 1px solid #222222;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+.relic-mode-btn[aria-pressed="true"] {
+  background: #0d1a0d;
+  border-color: #00ff66;
+  color: #00ff66;
+  box-shadow: 0 0 10px rgba(0, 255, 102, 0.25);
+}
+.relic-mode-btn[aria-pressed="true"] .relic-led {
+  background: #00ff66;
+  border-color: #00ff66;
+  box-shadow: 0 0 8px #00ff66;
+}
+
+/* CRT Screen Module */
+.relic-crt {
+  display: none;
+  margin-top: 18px;
+  background: #070908;
+  border: 2px solid #282828;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.9), 0 4px 14px rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+.player.is-relic-mode .relic-crt {
+  display: block;
+  animation: crt-warmup 0.35s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
+}
+@keyframes crt-warmup {
+  0% {
+    opacity: 0;
+    transform: scaleY(0.02) scaleX(0.8);
+    filter: brightness(3);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scaleY(0.08) scaleX(1);
+    filter: brightness(2);
+  }
+  100% {
+    opacity: 1;
+    transform: scaleY(1) scaleX(1);
+    filter: brightness(1);
+  }
+}
+.crt-bezel {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.crt-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 12px;
+  background: #111412;
+  border-bottom: 1px solid #222a24;
+  color: #5d7564;
+  font: 11px "Courier New", monospace;
+  letter-spacing: 0.08em;
+}
+.crt-screen {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  background: #040806;
+  overflow: hidden;
+  cursor: crosshair;
+}
+.relic-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+/* Reticle & Scanlines */
+.crt-reticle {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(0, 255, 102, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 102, 0.06) 1px, transparent 1px);
+  background-size: 40px 30px;
+  background-position: center center;
+}
+.crt-scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.32) 50%);
+  background-size: 100% 4px;
+}
+.crt-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at center, transparent 65%, rgba(0, 0, 0, 0.65) 100%);
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.85);
+}
+.crt-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: #0d100e;
+  border-top: 1px solid #1c221e;
+}
+.crt-switch-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #5d7564;
+  font: 11px "Courier New", monospace;
+}
+.crt-opt-btn,
+.crt-color-btn {
+  background: #141a16;
+  border: 1px solid #2d3830;
+  color: #7b9482;
+  font: 700 10px "Courier New", monospace;
+  padding: 2px 7px;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.15s ease;
+}
+.crt-opt-btn:hover,
+.crt-color-btn:hover {
+  color: #ffffff;
+  border-color: #55725d;
+}
+.crt-opt-btn.is-active,
+.crt-color-btn.is-active {
+  background: #1d2b21;
+  color: #00ff66;
+  border-color: #00ff66;
+  box-shadow: 0 0 6px rgba(0, 255, 102, 0.3);
+}
+/* Amber Phosphor Mode */
+.player.crt-amber .relic-mode-btn[aria-pressed="true"] {
+  border-color: #ffaa33;
+  color: #ffaa33;
+  box-shadow: 0 0 10px rgba(255, 170, 51, 0.25);
+}
+.player.crt-amber .relic-mode-btn[aria-pressed="true"] .relic-led {
+  background: #ffaa33;
+  border-color: #ffaa33;
+  box-shadow: 0 0 8px #ffaa33;
+}
+.player.crt-amber .crt-opt-btn.is-active,
+.player.crt-amber .crt-color-btn.is-active {
+  background: #2b1f0d;
+  color: #ffaa33;
+  border-color: #ffaa33;
+  box-shadow: 0 0 6px rgba(255, 170, 51, 0.3);
+}
+.player.crt-amber .crt-reticle {
+  background-image:
+    linear-gradient(rgba(255, 170, 51, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 170, 51, 0.06) 1px, transparent 1px);
+}
+/* Silver/White Phosphor Mode */
+.player.crt-silver .relic-mode-btn[aria-pressed="true"] {
+  border-color: #ffffff;
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.25);
+}
+.player.crt-silver .relic-mode-btn[aria-pressed="true"] .relic-led {
+  background: #ffffff;
+  border-color: #ffffff;
+  box-shadow: 0 0 8px #ffffff;
+}
+.player.crt-silver .crt-opt-btn.is-active,
+.player.crt-silver .crt-color-btn.is-active {
+  background: #242424;
+  color: #ffffff;
+  border-color: #ffffff;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.3);
+}
+.player.crt-silver .crt-reticle {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+}
+
+/* Subtle Full-Page Scanlines when Relic Mode is Active */
+body.relic-mode-active::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.08) 50%);
+  background-size: 100% 4px;
+  z-index: 99999;
+  opacity: 0.7;
+}

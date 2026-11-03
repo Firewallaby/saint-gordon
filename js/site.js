@@ -90,6 +90,14 @@
     )
       return false;
     if (text === "From the Saint Gordon Collective playlist.") return false;
+    if (
+      lower.includes("dm me") ||
+      lower.includes("for free mixing") ||
+      lower.includes("aspiring artists") ||
+      lower.includes("saint gordon has always been") ||
+      lower.includes("wanted to make it into a collective")
+    )
+      return false;
     return true;
   };
   const formatTrackNote = (value) =>
