@@ -212,7 +212,7 @@
     return entries;
   };
   const card = (t, i) =>
-    `<a class="card" href="${link(t)}"><div class="card-art"><img loading="lazy" src="${e(thumb(t))}" alt="${e(isPlaceholderArt(t) ? "Placeholder print study for " + t.title : t.artworkAlt || "Cover artwork for " + t.title)}"></div><div class="micro"><span>RELIC / ${String(tracks.indexOf(t) + 1).padStart(3, "0")}</span>${date(t) ? "<span>" + e(date(t)) + "</span>" : ""}</div><h3>${e(t.title)}</h3><p>${e(label(t))}</p></a>`;
+    `<a class="card" href="${link(t)}"><div class="card-art"><img loading="lazy" src="${e(thumb(t))}" alt="${e(isPlaceholderArt(t) ? "Placeholder print study for " + t.title : t.artworkAlt || "Cover artwork for " + t.title)}"></div><div class="micro"><span>FRAGMENT / ${String(tracks.indexOf(t) + 1).padStart(3, "0")}</span>${date(t) ? "<span>" + e(date(t)) + "</span>" : ""}</div><h3>${e(t.title)}</h3><p>${e(label(t))}</p></a>`;
   const menu = document.querySelector(".menu-toggle"),
     nav = document.querySelector("#navigation");
   menu.addEventListener("click", () => {
@@ -356,7 +356,7 @@
                 tracks = prepareTracks(updated);
                 renderMusic();
               } else {
-                document.title = "Relic not found — Saint Gordon Collective";
+                document.title = "Fragment not found — Saint Gordon Collective";
                 host.innerHTML =
                   '<section class="error-page"><span class="micro">ENTRY NOT FOUND</span><h1>Track not found.</h1><p>The track link is incomplete or no longer belongs to the collection.</p><a class="paper-button" href="collection.html">Return to the Collection</a></section>';
               }
@@ -364,7 +364,7 @@
           );
           return;
         }
-        document.title = "Relic not found — Saint Gordon Collective";
+        document.title = "Fragment not found — Saint Gordon Collective";
         host.innerHTML =
           '<section class="error-page"><span class="micro">ENTRY NOT FOUND</span><h1>Track not found.</h1><p>The track link is incomplete or no longer belongs to the collection.</p><a class="paper-button" href="collection.html">Return to the Collection</a></section>';
         return;
@@ -443,7 +443,7 @@
         sectionsMarkup || creditsMarkup
           ? `<div class="liner">${sectionsMarkup}${creditsMarkup}</div>`
           : "";
-      host.innerHTML = `<div class="song-head"><div><span class="badge">${e(label(t))}</span><h1>${e(t.title)}</h1></div><div class="micro">${e(t.artist)}${date(t) ? "<br>" + e(date(t)) : ""}</div></div><div class="song-layout"><div><div class="song-art"><img src="${e(art(t))}" alt="${e(isPlaceholderArt(t) ? "Placeholder print study" : t.artworkAlt || "Cover artwork for " + t.title)}"></div><div class="art-caption micro"><span>RELIC / ${String(tracks.indexOf(t) + 1).padStart(3, "0")}</span>${artCaption}</div><div id="track-player"></div>${streamingBar}</div>${linerMarkup}</div><section class="related"><div class="section-heading"><h2>More tracks</h2><a href="collection.html">The complete collection ↗</a></div><div class="cards">${relatedCards}</div></section>`;
+      host.innerHTML = `<div class="song-head"><div><span class="badge">${e(label(t))}</span><h1>${e(t.title)}</h1></div><div class="micro">${e(t.artist)}${date(t) ? "<br>" + e(date(t)) : ""}</div></div><div class="song-layout"><div><div class="song-art"><img src="${e(art(t))}" alt="${e(isPlaceholderArt(t) ? "Placeholder print study" : t.artworkAlt || "Cover artwork for " + t.title)}"></div><div class="art-caption micro"><span>FRAGMENT / ${String(tracks.indexOf(t) + 1).padStart(3, "0")}</span>${artCaption}</div><div id="track-player"></div>${streamingBar}</div>${linerMarkup}</div><section class="related"><div class="section-heading"><h2>More tracks</h2><a href="collection.html">The complete collection ↗</a></div><div class="cards">${relatedCards}</div></section>`;
       mountPlayer(document.querySelector("#track-player"), t);
     }
   }
