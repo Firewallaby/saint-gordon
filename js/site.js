@@ -303,6 +303,8 @@
         const summaryMarkup = hasContent(featured.summary)
           ? `<p>${e(featured.summary)}</p>`
           : "";
+        host.dataset.featuredSlug = featured.slug || "";
+        host.dataset.featuredUrl = featured.soundcloudUrl || "";
         host.innerHTML = `<div class="feature"><a class="feature-art" href="${link(featured)}"><img src="${e(art(featured))}" alt="${e(isPlaceholderArt(featured) ? "Placeholder artwork" : featured.artworkAlt || "Cover artwork for " + featured.title)}"></a><div><span class="badge">${e(label(featured))}</span><h3>${e(featured.title)}</h3><span class="micro">${e(featured.artist)}${date(featured) ? " / " + e(date(featured)) : ""}</span>${summaryMarkup}<div id="featured-player"></div>${featBar}<a class="text-link" href="${link(featured)}">Track details ↗</a></div></div>`;
         mountPlayer(document.querySelector("#featured-player"), featured);
       } else host.innerHTML = "<p>No tracks have been added yet.</p>";
@@ -488,8 +490,21 @@
         }
         const featured = tracks.find((track) => !track.placeholder);
         const host = document.querySelector("#featured");
-        const isPlaying = document.querySelector("#featured .is-playing");
-        if (featured && host && !isPlaying) {
+        const isPlaying = document.querySelector(
+          '#featured .is-playing, #featured .player[data-state="buffering"]',
+        );
+        const sameFeatured =
+          featured &&
+          host &&
+          host.dataset.featuredSlug === (featured.slug || "") &&
+          host.dataset.featuredUrl === (featured.soundcloudUrl || "");
+        if (featured && host && !isPlaying && !sameFeatured) {
+          const oldPlayer = document.querySelector("#featured-player");
+          if (oldPlayer && typeof oldPlayer._saintCleanup === "function") {
+            oldPlayer._saintCleanup();
+          }
+          host.dataset.featuredSlug = featured.slug || "";
+          host.dataset.featuredUrl = featured.soundcloudUrl || "";
           const featStreaming = [
             validUrl(featured.soundcloudUrl)
               ? `<a class="streaming-pill" href="${e(validUrl(featured.soundcloudUrl))}" target="_blank" rel="noopener noreferrer">SoundCloud ↗</a>`

@@ -2301,7 +2301,8 @@ h3,
   width: 18px;
   height: 18px;
 }
-.player .deck-btn:hover:not(:disabled) {
+.player .deck-btn:hover:not(:disabled),
+.player.is-playing .pause-button:not(:disabled) {
   border-color: #f2f2f2;
   color: #ffffff;
 }

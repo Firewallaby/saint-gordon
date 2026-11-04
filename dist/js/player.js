@@ -99,6 +99,7 @@
       )
       .join("");
   const ICONS = {
+    pause: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="7" y="5.5" width="3.5" height="13" rx="0.8" fill="currentColor"/><rect x="13.5" y="5.5" width="3.5" height="13" rx="0.8" fill="currentColor"/></svg>',
     back: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5a7 7 0 1 1-6.6 4.7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M4.6 4.6v4.7h4.7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><text x="12" y="15.4" text-anchor="middle" font-size="6.6" font-family="Courier New, monospace" font-weight="700" fill="currentColor">10</text></svg>',
     forward: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5a7 7 0 1 0 6.6 4.7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M19.4 4.6v4.7h-4.7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><text x="12" y="15.4" text-anchor="middle" font-size="6.6" font-family="Courier New, monospace" font-weight="700" fill="currentColor">10</text></svg>',
     volume: '<svg class="ico-on" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z" fill="currentColor"/><path d="M15 9.2a4 4 0 0 1 0 5.6M17.4 6.8a7.4 7.4 0 0 1 0 10.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><svg class="ico-off" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z" fill="currentColor"/><path d="M15.5 9.5l5 5M20.5 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
@@ -146,11 +147,12 @@
     const label = options.label || "AUDIO DECK";
     const title = escape(track.title);
     const initialWave = seededWave(track.slug || track.title, BARS);
-    host.innerHTML = `<section class="player" data-state="${url ? "loading" : "offline"}" aria-label="Music player for ${title}" style="--progress:0%;--pnum:0;--hover:0%;--vol:80%"><div class="deck-head"><span class="deck-id"><span class="deck-led" aria-hidden="true"></span><span class="deck-label">${escape(label)}</span><span class="deck-title">${title}</span></span><span class="deck-state" aria-hidden="true">${url ? "LOADING" : "OFFLINE"}</span></div><div class="deck-main"><button class="play-button"${url ? "" : " disabled"} aria-label="Play ${title}" aria-pressed="false" title="Play / pause (K)"><svg class="play-ring" viewBox="0 0 72 72" aria-hidden="true" focusable="false"><circle class="ring-track" cx="36" cy="36" r="34" pathLength="100"></circle><circle class="ring-fill" cx="36" cy="36" r="34" pathLength="100"></circle></svg><span class="play-icon" aria-hidden="true"></span></button><div class="deck-wave"><div class="wave"><div class="wave-stack" aria-hidden="true">${waveLayers(initialWave)}</div><span class="wave-head" aria-hidden="true"></span><span class="wave-tip" aria-hidden="true">0:00</span><input class="seek" type="range" min="0" max="1000" value="0" step="1" disabled aria-label="Playback position" aria-valuetext="0:00"><span class="wave-focus" aria-hidden="true"></span></div><div class="player-times"><span class="current">0:00</span><button type="button" class="time-toggle" title="Show remaining time" aria-label="Toggle remaining time"><span class="duration">--:--</span></button></div></div></div><div class="deck-controls"><div class="deck-transport"><button type="button" class="deck-btn skip-back" aria-label="Back 10 seconds" title="Back 10s (J)" disabled>${ICONS.back}</button><button type="button" class="deck-btn skip-forward" aria-label="Forward 10 seconds" title="Forward 10s (L)" disabled>${ICONS.forward}</button></div><div class="player-volume"><button type="button" class="deck-btn mute-button" aria-label="Mute" aria-pressed="false" title="Mute (M)" disabled>${ICONS.volume}</button><input class="volume" type="range" min="0" max="100" value="80" disabled aria-label="Volume"></div>${url ? `<p class="attribution">${escape(track.artist)} · <a href="${escape(attributionUrl)}" target="_blank" rel="noopener noreferrer">Listen on SoundCloud ↗</a></p>` : ""}</div><p class="player-status" role="status">${url ? "Connecting to SoundCloud…" : "Audio unavailable — a SoundCloud track has not been supplied."}</p>${url ? `<div class="player-handoff">Your browser wants one direct tap. Press play on the SoundCloud panel below — the deck stays in sync after that.</div><iframe class="player-source" title="SoundCloud audio source: ${title}" src="${widgetUrl}" aria-hidden="true" tabindex="-1" allow="autoplay"></iframe><iframe class="player-fallback" title="SoundCloud fallback: ${title}" aria-hidden="true" tabindex="-1" allow="autoplay"></iframe>` : ""}</section>`;
+    host.innerHTML = `<section class="player" data-state="${url ? "loading" : "offline"}" aria-label="Music player for ${title}" style="--progress:0%;--pnum:0;--hover:0%;--vol:80%"><div class="deck-head"><span class="deck-id"><span class="deck-led" aria-hidden="true"></span><span class="deck-label">${escape(label)}</span><span class="deck-title">${title}</span></span><span class="deck-state" aria-hidden="true">${url ? "LOADING" : "OFFLINE"}</span></div><div class="deck-main"><button class="play-button"${url ? "" : " disabled"} aria-label="Play ${title}" aria-pressed="false" title="Play / pause (K)"><svg class="play-ring" viewBox="0 0 72 72" aria-hidden="true" focusable="false"><circle class="ring-track" cx="36" cy="36" r="34" pathLength="100"></circle><circle class="ring-fill" cx="36" cy="36" r="34" pathLength="100"></circle></svg><span class="play-icon" aria-hidden="true"></span></button><div class="deck-wave"><div class="wave"><div class="wave-stack" aria-hidden="true">${waveLayers(initialWave)}</div><span class="wave-head" aria-hidden="true"></span><span class="wave-tip" aria-hidden="true">0:00</span><input class="seek" type="range" min="0" max="1000" value="0" step="1" disabled aria-label="Playback position" aria-valuetext="0:00"><span class="wave-focus" aria-hidden="true"></span></div><div class="player-times"><span class="current">0:00</span><button type="button" class="time-toggle" title="Show remaining time" aria-label="Toggle remaining time"><span class="duration">--:--</span></button></div></div></div><div class="deck-controls"><div class="deck-transport"><button type="button" class="deck-btn pause-button" aria-label="Pause ${title}" title="Pause (K)" disabled>${ICONS.pause}</button><button type="button" class="deck-btn skip-back" aria-label="Back 10 seconds" title="Back 10s (J)" disabled>${ICONS.back}</button><button type="button" class="deck-btn skip-forward" aria-label="Forward 10 seconds" title="Forward 10s (L)" disabled>${ICONS.forward}</button></div><div class="player-volume"><button type="button" class="deck-btn mute-button" aria-label="Mute" aria-pressed="false" title="Mute (M)" disabled>${ICONS.volume}</button><input class="volume" type="range" min="0" max="100" value="80" disabled aria-label="Volume"></div>${url ? `<p class="attribution">${escape(track.artist)} · <a href="${escape(attributionUrl)}" target="_blank" rel="noopener noreferrer">Listen on SoundCloud ↗</a></p>` : ""}</div><p class="player-status" role="status">${url ? "Connecting to SoundCloud…" : "Audio unavailable — a SoundCloud track has not been supplied."}</p>${url ? `<div class="player-handoff">Your browser wants one direct tap. Press play on the SoundCloud panel below — the deck stays in sync after that.</div><iframe class="player-source" title="SoundCloud audio source: ${title}" src="${widgetUrl}" aria-hidden="true" tabindex="-1" allow="autoplay"></iframe><iframe class="player-fallback" title="SoundCloud fallback: ${title}" aria-hidden="true" tabindex="-1" allow="autoplay"></iframe>` : ""}</section>`;
     if (!url) return;
     const root = host.querySelector(".player"),
       q = (selector) => root.querySelector(selector),
       play = q(".play-button"),
+      pauseBtn = q(".pause-button"),
       seek = q(".seek"),
       volume = q(".volume"),
       current = q(".current"),
@@ -268,24 +270,30 @@
       play.disabled = false;
       seek.disabled = volume.disabled = true;
       setControls(false);
-      root.classList.remove("is-playing");
+      root.classList.toggle("is-playing", Boolean(shouldPlay));
       root.classList.add("is-fallback");
       showFrame(fallback, true);
-      isPlaying = false;
+      isPlaying = Boolean(shouldPlay);
+      play.setAttribute("aria-pressed", String(Boolean(shouldPlay)));
+      if (pauseBtn) pauseBtn.disabled = !shouldPlay;
       fallbackActive = true;
-      setDeck("backup");
+      setDeck(shouldPlay ? "playing" : "backup");
       fallback.src = widgetUrl.replace(
         "auto_play=false",
         "auto_play=" + String(Boolean(shouldPlay)),
       );
       status.textContent = shouldPlay
-        ? "Switching to SoundCloud playback…"
+        ? "Playing through SoundCloud backup."
         : "SoundCloud backup ready. Press play to listen.";
     };
     const fail = () => {
       if (failed) return;
       const shouldPlay = playRequested || isPlaying;
-      if (widget && isPlaying) widget.pause();
+      if (widget && isPlaying) {
+        try {
+          widget.pause();
+        } catch (_) {}
+      }
       activateFallback(shouldPlay);
     };
     const timeout = setTimeout(fail, 18000);
@@ -314,11 +322,28 @@
         "aria-label",
         (playing ? "Pause " : "Play ") + track.title,
       );
+      if (pauseBtn) {
+        pauseBtn.disabled = !playing;
+        pauseBtn.setAttribute("aria-pressed", String(!playing && hasPlayed));
+      }
       setDeck(playing ? "playing" : "paused");
       status.textContent = playing
         ? "Playing through SoundCloud."
         : "Paused. Press play to continue.";
       updateMini();
+    };
+    const pausePlayback = () => {
+      playRequested = awaitingPlay = false;
+      clearPlayAttempt();
+      if (fallbackActive && fallback) {
+        fallback.src = widgetUrl;
+      }
+      if (widget) {
+        try {
+          widget.pause();
+        } catch (_) {}
+      }
+      state(false);
     };
     const startPlayback = () => {
       if (fallbackActive) {
@@ -335,6 +360,7 @@
       if (!ready || failed) {
         if (!failed) {
           playRequested = true;
+          if (pauseBtn) pauseBtn.disabled = false;
           setDeck("buffering");
           status.textContent = "Starting when connected to SoundCloud…";
         }
@@ -342,6 +368,7 @@
       }
       playRequested = false;
       awaitingPlay = true;
+      if (pauseBtn) pauseBtn.disabled = false;
       setDeck("buffering");
       status.textContent = "Starting playback…";
       widget.play();
@@ -410,6 +437,7 @@
     api()
       .then((SC) => {
         widget = SC.Widget(source);
+        widget._saintSource = source;
         players.add(widget);
         widget.bind(SC.Widget.Events.READY, () => {
           clearTimeout(timeout);
@@ -434,11 +462,20 @@
           root.classList.remove("is-fallback");
           clearPlayAttempt();
           collapseHandoff();
-          players.forEach((other) => {
-            if (other !== widget) other.pause();
-          });
           const firstPlay = !hasPlayed;
           state(true);
+          players.forEach((other) => {
+            if (other === widget) return;
+            if (other._saintSource && other._saintSource.isConnected === false) {
+              players.delete(other);
+              return;
+            }
+            try {
+              other.pause();
+            } catch (_) {
+              players.delete(other);
+            }
+          });
           learnDuration();
           if (firstPlay && pendingSeek !== null) {
             widget.seekTo(pendingSeek);
@@ -450,7 +487,11 @@
           else if (isPlaying) state(false);
         });
         widget.bind(SC.Widget.Events.PLAY_PROGRESS, (data) => {
-          if (!failed) position(data.currentPosition);
+          if (failed) return;
+          if ((awaitingPlay || playRequested) && !isPlaying && data && data.currentPosition > 0) {
+            state(true);
+          }
+          position(data.currentPosition);
         });
         widget.bind(SC.Widget.Events.SEEK, (data) => {
           if (!failed) position(data.currentPosition);
@@ -474,10 +515,8 @@
         fail();
       });
     const toggle = () => {
-      if (isPlaying) {
-        awaitingPlay = false;
-        if (widget) widget.pause();
-        else state(false);
+      if (isPlaying || awaitingPlay || playRequested) {
+        pausePlayback();
       } else if (fallbackActive && !ready) {
         activateFallback(true);
       } else {
@@ -502,6 +541,7 @@
       paintVolume();
     };
     play.addEventListener("click", toggle);
+    if (pauseBtn) pauseBtn.addEventListener("click", pausePlayback);
     if (skipBack) skipBack.addEventListener("click", () => skip(-10000));
     if (skipForward) skipForward.addEventListener("click", () => skip(10000));
     if (mute) mute.addEventListener("click", toggleMute);

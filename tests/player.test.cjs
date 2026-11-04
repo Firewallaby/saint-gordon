@@ -38,6 +38,7 @@ function setup(apiPresent = true) {
   const names = [
     ".player",
     ".play-button",
+    ".pause-button",
     ".seek",
     ".volume",
     ".current",
@@ -129,11 +130,20 @@ function setup(apiPresent = true) {
   assert.equal(x.nodes[".deck-state"].textContent, "BUFFERING");
   x.bound.PLAY();
   assert.equal(x.nodes[".play-button"].attrs["aria-pressed"], "true");
+  assert.equal(x.nodes[".pause-button"].disabled, false);
   assert.equal(x.nodes[".deck-state"].textContent, "PLAYING");
   x.nodes[".play-button"].fire("click");
   assert.deepEqual(x.calls.pop(), ["pause"]);
+  assert.equal(x.nodes[".play-button"].attrs["aria-pressed"], "false");
+  assert.equal(x.nodes[".deck-state"].textContent, "PAUSED");
   x.bound.PAUSE();
   assert.equal(x.nodes[".play-button"].attrs["aria-pressed"], "false");
+  x.bound.PLAY();
+  assert.equal(x.nodes[".play-button"].attrs["aria-pressed"], "true");
+  x.nodes[".pause-button"].fire("click");
+  assert.deepEqual(x.calls.pop(), ["pause"]);
+  assert.equal(x.nodes[".play-button"].attrs["aria-pressed"], "false");
+  assert.equal(x.nodes[".pause-button"].disabled, true);
   x.bound.PLAY_PROGRESS({ currentPosition: 30000 });
   assert.equal(x.nodes[".seek"].value, "250");
   assert.equal(x.nodes[".current"].textContent, "0:30");
