@@ -43,15 +43,15 @@ function setup(apiPresent = true) {
     ".current",
     ".duration",
     ".player-status",
-    ".player-spectrum",
     ".player-source",
     ".player-fallback",
+    ".deck-state",
+    ".skip-back",
+    ".skip-forward",
+    ".mute-button",
+    ".time-toggle",
   ];
   for (const n of names) nodes[n] = new Element();
-  nodes[".player-spectrum"].children = Array.from(
-    { length: 40 },
-    () => new Element(),
-  );
   nodes[".volume"].value = "80";
   nodes[".player"].querySelector = (n) => nodes[n];
   const host = { innerHTML: "", querySelector: (n) => nodes[n] };
@@ -102,28 +102,34 @@ function setup(apiPresent = true) {
   x.player.mount(x.host, { title: "Example", soundcloudUrl: "" });
   assert.match(x.host.innerHTML, /Audio unavailable/);
   assert.doesNotMatch(x.host.innerHTML, /<iframe/);
-  assert.match(x.host.innerHTML, /class="player-spectrum" aria-hidden="true"/);
-  assert.equal((x.host.innerHTML.match(/<i style="--bar-height:/g) || []).length, 40);
+  assert.match(x.host.innerHTML, /class="wave-stack" aria-hidden="true"/);
+  assert.equal((x.host.innerHTML.match(/<span style="--h:/g) || []).length, 64 * 3);
+  assert.match(x.host.innerHTML, /data-state="offline"/);
   x = setup();
   x.player.mount(x.host, {
     title: "Example",
     artist: "Artist",
     soundcloudUrl: "https://soundcloud.com/example/track",
-  });
+  }, { label: "FRAGMENT / 007" });
   await Promise.resolve();
   assert.match(x.host.innerHTML, /auto_play=false/);
   assert.doesNotMatch(x.host.innerHTML, /<details/);
   assert.match(x.host.innerHTML, /class="player-source"/);
   assert.match(x.host.innerHTML, /class="player-fallback"[^>]*aria-hidden="true"/);
   assert.equal(x.calls.length, 0);
+  assert.match(x.host.innerHTML, /FRAGMENT \/ 007/);
   x.bound.READY();
   assert.equal(x.nodes[".play-button"].disabled, false);
+  assert.equal(x.nodes[".skip-back"].disabled, false);
   assert.equal(x.nodes[".duration"].textContent, "2:00");
+  assert.equal(x.nodes[".player"].attrs["data-state"], "ready");
   assert.deepEqual(x.calls.pop(), ["volume", 80]);
   x.nodes[".play-button"].fire("click");
   assert.deepEqual(x.calls.pop(), ["play"]);
+  assert.equal(x.nodes[".deck-state"].textContent, "BUFFERING");
   x.bound.PLAY();
   assert.equal(x.nodes[".play-button"].attrs["aria-pressed"], "true");
+  assert.equal(x.nodes[".deck-state"].textContent, "PLAYING");
   x.nodes[".play-button"].fire("click");
   assert.deepEqual(x.calls.pop(), ["pause"]);
   x.bound.PAUSE();
@@ -131,10 +137,21 @@ function setup(apiPresent = true) {
   x.bound.PLAY_PROGRESS({ currentPosition: 30000 });
   assert.equal(x.nodes[".seek"].value, "250");
   assert.equal(x.nodes[".current"].textContent, "0:30");
-  assert.notEqual(
-    x.nodes[".player-spectrum"].children[0].style.values["--bar-height"],
-    "28%",
-  );
+  assert.equal(x.nodes[".player"].style.values["--progress"], "25%");
+  assert.equal(x.nodes[".player"].style.values["--pnum"], "25");
+  x.nodes[".skip-forward"].fire("click");
+  assert.deepEqual(x.calls.pop(), ["seek", 40000]);
+  x.nodes[".skip-back"].fire("click");
+  assert.deepEqual(x.calls.pop(), ["seek", 30000]);
+  x.nodes[".time-toggle"].fire("click");
+  assert.equal(x.nodes[".duration"].textContent, "-1:30");
+  x.nodes[".time-toggle"].fire("click");
+  assert.equal(x.nodes[".duration"].textContent, "2:00");
+  x.nodes[".mute-button"].fire("click");
+  assert.deepEqual(x.calls.pop(), ["volume", 0]);
+  assert.equal(x.nodes[".mute-button"].attrs["aria-pressed"], "true");
+  x.nodes[".mute-button"].fire("click");
+  assert.deepEqual(x.calls.pop(), ["volume", 80]);
   x.nodes[".seek"].value = "500";
   x.nodes[".seek"].fire("input");
   x.nodes[".seek"].fire("change");
@@ -193,7 +210,22 @@ function setup(apiPresent = true) {
   x.timers[0]();
   assert.equal(x.nodes[".play-button"].disabled, false);
   assert.match(x.nodes[".player-fallback"].src, /auto_play=false/);
+  x = setup();
+  x.player.mount(x.host, {
+    title: "Blocked remote start",
+    soundcloudUrl: "https://soundcloud.com/example/track",
+  });
+  await Promise.resolve();
+  x.bound.READY();
+  x.nodes[".play-button"].fire("click");
+  x.timers[1]();
+  x.timers[2]();
+  assert.match(x.nodes[".player-status"].textContent, /SoundCloud panel/);
+  assert.equal(x.nodes[".player-source"].attrs["aria-hidden"], "false");
+  x.bound.PLAY();
+  assert.equal(x.nodes[".player-source"].attrs["aria-hidden"], "true");
+  assert.equal(x.nodes[".deck-state"].textContent, "PLAYING");
   console.log(
-    "PASS: URL safety, time formatting, missing URL, no autoplay, ready, play, pause, progress, seek, volume, finish, errors, blocked API, timeout. Live SoundCloud not simulated.",
+    "PASS: deck controls (skip, mute, remaining time, state chip), iOS handoff, URL safety, time formatting, missing URL, no autoplay, ready, play, pause, progress, seek, volume, finish, errors, blocked API, timeout. Live SoundCloud not simulated.",
   );
 })();

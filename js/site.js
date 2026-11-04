@@ -266,7 +266,10 @@
     n.innerHTML = links.join(" ");
   });
   function mountPlayer(node, t) {
-    window.SaintPlayer.mount(node, t);
+    const number = tracks.indexOf(t) + 1;
+    window.SaintPlayer.mount(node, t, {
+      label: number > 0 ? "FRAGMENT / " + String(number).padStart(3, "0") : "AUDIO DECK",
+    });
   }
   function renderMusic() {
     if (page === "index") {
