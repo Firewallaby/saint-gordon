@@ -6,6 +6,8 @@ A portable, build-free website made with vanilla HTML, CSS and JavaScript. No np
 
 The website checks for public SoundCloud releases when visitors open the homepage, collection or a track page, and again every five minutes while the page is open. The live catalogue is served by a cached endpoint on Vercel and shared by both hosted versions. The repository's saved catalogue is shown immediately and stays available if SoundCloud cannot be reached.
 
+GitHub Actions also refreshes the repository's saved catalogue every 30 minutes and publishes changes to GitHub Pages. Run **Auto-update SoundCloud Releases** from the **Actions** tab to check immediately.
+
 The importer reads the profile's public RSS feed and recent public track listings. Uploads can appear on the site without being added to the Saint Gordon Pieces playlist. The catalogue uses the publication order, preserves older saved entries when they fall out of the feed, and keeps local artwork, notes and stable links. Private tracks and reposts are outside the import. If a source request fails, the previous catalogue stays available.
 
 For a local update, double-click **Update Music.command** or run `python3 scripts/update_soundcloud.py`. It updates the catalogue, `dist/` and the portable ZIP when there are changes. `--check` validates the sources without writing files. Use `--watch` to poll locally, or `bash scripts/install_autoupdater.sh` to install the macOS background service. Local sync refreshes the saved catalogue and is optional for the hosted site.
