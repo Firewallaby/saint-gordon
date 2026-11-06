@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""Key-free, on-demand public playlist import. Python 3 standard library only."""
+"""Import public Saint Gordon releases. Python 3 standard library only."""
 import argparse
 import datetime
+import email.utils
 import json
 import re
 import shutil
@@ -11,11 +12,15 @@ import time
 import urllib.parse
 import urllib.request
 import zipfile
+from xml.etree import ElementTree
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PROFILE = 'https://soundcloud.com/ceannairefr'
-PLAYLIST = PROFILE + '/sets/saint-gordon-pieces'
+PROFILE_TRACKS = PROFILE + '/tracks'
+FEED = 'https://feeds.soundcloud.com/users/soundcloud:users:397958661/sounds.rss'
+ITUNES = '{http://www.itunes.com/dtds/podcast-1.0.dtd}'
+PLACEHOLDER = 'assets/artwork/cover-placeholder.svg'
 
 
 def fetch(url):
@@ -37,18 +42,73 @@ def assignment(text, name):
     return json.JSONDecoder().raw_decode(text[match.end():])[0]
 
 
-def playlist_ids(html):
-    data = assignment(html, 'window.__sc_hydration')
-    playlists = [item['data'] for item in data if item.get('hydratable') == 'playlist']
-    playlist = next((p for p in playlists if p.get('permalink_url') == PLAYLIST), None)
-    if not playlist or playlist.get('sharing') != 'public':
-        raise ValueError('The public playlist could not be read. No site files changed.')
-    tracks = playlist.get('tracks', [])
-    if not tracks or len(tracks) != playlist.get('track_count'):
-        raise ValueError('SoundCloud returned an incomplete playlist. No site files changed.')
-    if any(not isinstance(t.get('id'), int) for t in tracks):
-        raise ValueError('Playlist track IDs are incomplete.')
+def profile_track_url(url):
+    return bool(re.fullmatch(re.escape(PROFILE) + r'/[\w-]+', url))
+
+
+def feed_tracks(xml):
+    channel = ElementTree.fromstring(xml).find('channel')
+    if channel is None or (channel.findtext('link') or '').rstrip('/') != PROFILE:
+        raise ValueError('SoundCloud did not return the Saint Gordon feed.')
+    tracks = []
+    for entry in channel.findall('item'):
+        url = entry.findtext('link') or ''
+        if not profile_track_url(url):
+            continue
+        track_id = re.fullmatch(r'tag:soundcloud,2010:tracks/(\d+)', entry.findtext('guid') or '')
+        title = entry.findtext('title')
+        if not track_id or not title:
+            raise ValueError('A SoundCloud feed entry is incomplete.')
+        image = entry.find(ITUNES + 'image')
+        tracks.append({
+            'id': int(track_id[1]),
+            'title': title,
+            'url': url,
+            'artist': entry.findtext(ITUNES + 'author') or 'Saint Gordon',
+            'description': entry.findtext('description') or '',
+            'published': email.utils.parsedate_to_datetime(entry.findtext('pubDate')),
+            'artwork': image.get('href', '') if image is not None else '',
+        })
+    if not tracks:
+        raise ValueError('SoundCloud returned an empty release feed.')
     return tracks
+
+
+def profile_track_urls(html):
+    # SoundCloud renders the newest uploads as MusicRecording entries for public crawlers.
+    entries = re.findall(r'<article\b[^>]*itemprop="track"[^>]*>(.*?)</article>', html, re.S)
+    urls = []
+    for entry in entries:
+        match = re.search(r'<a\s+itemprop="url"\s+href="([^"]+)"', entry)
+        if match:
+            url = urllib.parse.urljoin(PROFILE, match[1])
+            if profile_track_url(url):
+                urls.append(url)
+    if not urls:
+        raise ValueError('SoundCloud did not return public tracks on the profile page.')
+    return urls
+
+
+def public_track(url):
+    html = fetch(url).decode('utf-8')
+    hydration = assignment(html, 'window.__sc_hydration')
+    for entry in hydration:
+        if entry.get('hydratable') != 'sound':
+            continue
+        track = entry['data']
+        user = track.get('user') or {}
+        if (track.get('permalink_url') == url and track.get('sharing') == 'public'
+                and user.get('permalink_url') == PROFILE):
+            return {
+                'id': track['id'],
+                'title': track['title'],
+                'url': url,
+                'artist': user['username'],
+                'description': track.get('description') or '',
+                'published': datetime.datetime.fromisoformat((track.get('published_at') or track['created_at']).replace('Z', '+00:00')),
+                'artwork': track.get('artwork_url') or '',
+            }
+    raise ValueError('Could not verify the public SoundCloud track ' + url)
 
 
 def split_artist_names(value):
@@ -93,62 +153,84 @@ def build():
     saved = assignment((ROOT / 'js/tracks.js').read_text(), 'window.SAINT_TRACKS')
     generated = ROOT / 'js/soundcloud-data.js'
     previous = assignment(generated.read_text(), 'window.SAINT_SYNCED_TRACKS') if generated.exists() else []
-    all_saved = saved + previous
-    remote = playlist_ids(fetch(PLAYLIST).decode('utf-8'))
+    known = previous + saved
+    by_id = {track['soundcloudId']: track for track in reversed(known) if track.get('soundcloudId')}
+    by_url = {track['soundcloudUrl']: track for track in reversed(known) if track.get('soundcloudUrl')}
+
+    remote = {track['url']: track for track in feed_tracks(fetch(FEED))}
+    for url in profile_track_urls(fetch(PROFILE_TRACKS).decode('utf-8')):
+        if url not in remote:
+            remote[url] = public_track(url)
+
     output, artwork = [], {}
-    for index, item in enumerate(reversed(remote), 1):
-        track_id = item['id']
-        embed_url = 'https://api.soundcloud.com/tracks/' + str(track_id)
-        public = json.loads(fetch('https://soundcloud.com/oembed?' + urllib.parse.urlencode({'format': 'json', 'url': embed_url})))
-        # oEmbed is requested without a secret token or authentication. Only
-        # embeds attributed to this exact uploader are allowed into the site.
-        if public.get('author_url', '').rstrip('/') != PROFILE:
-            print('Skipping a track uploaded by another account.')
-            continue
-        if item.get('sharing', 'public') != 'public':
-            continue
-        suffix = ' by ' + public.get('author_name', '')
-        title = public.get('title', '')
-        if suffix and title.endswith(suffix):
-            title = title[:-len(suffix)]
-        if not title:
-            raise ValueError('A track title is missing; import stopped.')
-        local = next((t for t in all_saved if t.get('soundcloudId') == track_id or (item.get('permalink_url') and t.get('soundcloudUrl') == item['permalink_url']) or ' '.join(t.get('title', '').casefold().split()) == ' '.join(title.casefold().split())), {})
+    for item in sorted(remote.values(), key=lambda track: track['published'], reverse=True):
+        track_id, title, url = item['id'], item['title'], item['url']
+        local = by_id.get(track_id) or by_url.get(url) or {}
         track = dict(local)
-        raw_desc = public.get('description') or ''
-        is_promo = any(w in raw_desc.lower() for w in ['dm me', 'free mixing', 'aspiring artists', 'saint gordon has always been'])
-        clean_desc = '' if is_promo else raw_desc
-        track.update(slug=local.get('slug') or 'soundcloud-' + str(track_id), title=title,
-                     artist=public['author_name'], soundcloudId=track_id,
-                     soundcloudUrl=item.get('permalink_url') or (local.get('soundcloudUrl') if local.get('soundcloudUrl') and not local.get('soundcloudUrl').startswith('https://api.soundcloud.com/') else None) or embed_url,
-                     summary=clean_desc or local.get('summary') or 'From the Saint Gordon Collective playlist.',
-                     artistCredits=infer_artist_credits(title, clean_desc or local.get('summary') or '', local),
-                     placeholder=False, type='SoundCloud track')
-        if not track.get('meaning') or 'not been supplied' in track.get('meaning', ''):
-            track['meaning'] = clean_desc or local.get('meaning') or ''
-        if item.get('release_date'):
-            track['releaseDate'] = item['release_date'][:10]
-        # Prefer deliberately supplied local artwork; otherwise refresh oEmbed art.
-        if not local.get('artwork') or local.get('artworkPlaceholder') or '/soundcloud-' in local.get('artwork', ''):
-            url = public.get('thumbnail_url', '')
-            parsed = urllib.parse.urlparse(url)
-            if parsed.scheme == 'https' and parsed.hostname and parsed.hostname.endswith('.sndcdn.com'):
-                blob = fetch(url)
-                if not blob.startswith(b'\xff\xd8'):
-                    raise ValueError('Artwork was not the expected JPEG; import stopped.')
-                filename = 'assets/artwork/soundcloud-' + str(track_id) + '.jpg'
+        description = item['description'].strip()
+        if description == title + ' by ' + item['artist'] or any(
+            term in description.lower() for term in ('dm me', 'free mixing', 'aspiring artists', 'saint gordon has always been')
+        ):
+            description = ''
+        track.update(
+            slug=local.get('slug') or 'soundcloud-' + str(track_id),
+            title=title,
+            artist=item['artist'],
+            soundcloudId=track_id,
+            soundcloudUrl=url,
+            summary=local.get('summary') or description or 'From Saint Gordon on SoundCloud.',
+            artistCredits=infer_artist_credits(title, description or local.get('summary') or '', local),
+            placeholder=False,
+            type='SoundCloud track',
+        )
+        if not local:
+            track['releaseDate'] = item['published'].date().isoformat()
+        if not track.get('meaning') or 'not been supplied' in track['meaning']:
+            track['meaning'] = description or local.get('meaning') or ''
+        if not track.get('artwork') or track.get('artworkPlaceholder'):
+            art_url = urllib.parse.urlparse(item['artwork'])
+            if art_url.scheme == 'https' and art_url.hostname and art_url.hostname.endswith('.sndcdn.com'):
+                resized = re.sub(r'-(?:t\d+x\d+|large)(\.[a-z]+)$', r'-t500x500\1', item['artwork'])
+                blob = fetch(resized)
+                if blob.startswith(b'\xff\xd8'):
+                    extension = 'jpg'
+                elif blob.startswith(b'\x89PNG\r\n\x1a\n'):
+                    extension = 'png'
+                else:
+                    raise ValueError('SoundCloud returned invalid artwork for ' + title)
+                filename = f'assets/artwork/soundcloud-{track_id}.{extension}'
                 artwork[filename] = blob
-                track.update(artwork=filename, artworkThumb=filename, artworkPlaceholder=False, artworkAlt='Cover artwork for ' + title)
+                track.update(artwork=filename, artworkThumb=filename, artworkPlaceholder=False,
+                             artworkAlt='Cover artwork for ' + title)
             else:
-                track.update(artwork='assets/artwork/cover-placeholder.svg', artworkPlaceholder=True)
+                track.update(artwork=PLACEHOLDER, artworkThumb=PLACEHOLDER, artworkPlaceholder=True)
         output.append(track)
-        print(f'{index}/{len(remote)}: {title}')
-        time.sleep(0.15)
-    if not output:
-        raise ValueError('No public uploads from your account were returned. No files changed.')
-    if len({t['slug'] for t in output}) != len(output):
-        raise ValueError('Duplicate track slugs found; no files changed.')
+
+    # Feed inclusion is optional on SoundCloud. Keep older saved releases the feed omits.
+    ids = {track['soundcloudId'] for track in output}
+    urls = {track['soundcloudUrl'] for track in output}
+    output.extend(track for track in previous if track.get('soundcloudId') not in ids
+                  and track.get('soundcloudUrl') not in urls)
+    if len({track['slug'] for track in output}) != len(output) or len({track['soundcloudId'] for track in output}) != len(output):
+        raise ValueError('Duplicate SoundCloud releases found; no files changed.')
     return output, artwork
+
+
+def catalogue_payload(tracks):
+    return ('// Generated by scripts/update_soundcloud.py. Edit local overrides in tracks.js.\n'
+            'window.SAINT_SYNCED_TRACKS = ' + json.dumps(tracks, ensure_ascii=False, indent=2) + ';\n')
+
+
+def has_updates(tracks, artwork):
+    for directory in (ROOT, ROOT / 'dist'):
+        target = directory / 'js/soundcloud-data.js'
+        if not target.exists() or target.read_text() != catalogue_payload(tracks):
+            return True
+        for filename, blob in artwork.items():
+            path = directory / filename
+            if not path.exists() or path.read_bytes() != blob:
+                return True
+    return False
 
 
 def copy_file(src, dest):
@@ -158,13 +240,13 @@ def copy_file(src, dest):
 
 
 def publish(tracks, artwork):
-    stamp = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%d-%H%M%S-%f')
     backup = ROOT / '.update-backups' / stamp
     backup.mkdir(parents=True)
     target = ROOT / 'js/soundcloud-data.js'
     if target.exists():
         copy_file(target, backup / target.name)
-    payload = '// Generated by scripts/update_soundcloud.py. Edit local overrides in tracks.js.\nwindow.SAINT_SYNCED_TRACKS = ' + json.dumps(tracks, ensure_ascii=False, indent=2) + ';\n'
+    payload = catalogue_payload(tracks)
     for filename, blob in artwork.items():
         path = ROOT / filename
         if path.exists():
@@ -174,10 +256,10 @@ def publish(tracks, artwork):
     temporary = target.with_suffix('.tmp')
     temporary.write_text(payload)
     temporary.replace(target)
-    # Refresh every script and stylesheet version together, including rendering logic.
+    # Refresh the generated catalogue even when the browser has the previous file cached.
     for page in ROOT.glob('*.html'):
         html = page.read_text()
-        updated = re.sub(r'((?:js|css)/[^"?\s]+)\?v=[^"\s]+', lambda match: match.group(1) + '?v=' + stamp, html)
+        updated = re.sub(r'(js/soundcloud-data\.js)\?v=[^"\s]+', lambda match: match.group(1) + '?v=' + stamp, html)
         if updated != html:
             copy_file(page, backup / page.name)
             page.write_text(updated)
@@ -213,10 +295,7 @@ if __name__ == '__main__':
         while True:
             try:
                 tracks, artwork = build()
-                target = ROOT / 'js/soundcloud-data.js'
-                prev_text = target.read_text() if target.exists() else ''
-                new_text = '// Generated by scripts/update_soundcloud.py. Edit local overrides in tracks.js.\nwindow.SAINT_SYNCED_TRACKS = ' + json.dumps(tracks, ensure_ascii=False, indent=2) + ';\n'
-                if prev_text.strip() != new_text.strip() or artwork:
+                if has_updates(tracks, artwork):
                     print(f"[{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Detected updates on SoundCloud. Publishing...")
                     publish(tracks, artwork)
                 else:
@@ -229,8 +308,10 @@ if __name__ == '__main__':
             tracks, artwork = build()
             if args.check:
                 print(f'CHECK PASSED: {len(tracks)} public tracks. No files changed.')
-            else:
+            elif has_updates(tracks, artwork):
                 publish(tracks, artwork)
+            else:
+                print(f'Up to date ({len(tracks)} public tracks).')
         except Exception as error:
             print('Update failed:', error, file=sys.stderr)
             print('If SoundCloud is unavailable, try again later. No login or key is required.', file=sys.stderr)

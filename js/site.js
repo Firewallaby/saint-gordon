@@ -50,10 +50,10 @@
       }),
     );
   }
-  const cachedDynamic = window.SaintPlaylist?.getCached();
-  let tracks = prepareTracks(
-    cachedDynamic || window.SAINT_SYNCED_TRACKS || localTracks,
-  );
+  const publishedTracks = window.SAINT_SYNCED_TRACKS;
+  const canSyncPlaylist = !publishedTracks && config.playlistUrl && window.SaintPlaylist?.sync;
+  const cachedDynamic = canSyncPlaylist ? window.SaintPlaylist.getCached() : null;
+  let tracks = prepareTracks(publishedTracks || cachedDynamic || localTracks);
   document.querySelectorAll("[data-copy]").forEach((node) => {
     const [section, key] = node.dataset.copy.split(".");
     const value = window.SAINT_CONTENT?.[section]?.[key];
@@ -345,10 +345,10 @@
       );
       const host = document.querySelector("#song-detail");
       if (!t) {
-        document.title = "Locating release — Saint Gordon Collective";
-        host.innerHTML =
-          '<section class="error-page"><span class="micro">CONNECTING TRANSMISSION</span><h1>Locating release...</h1><p>Checking live SoundCloud playlist for this track...</p></section>';
-        if (config.playlistUrl && window.SaintPlaylist?.sync) {
+        if (canSyncPlaylist) {
+          document.title = "Locating release — Saint Gordon Collective";
+          host.innerHTML =
+            '<section class="error-page"><span class="micro">CONNECTING TRANSMISSION</span><h1>Locating release...</h1><p>Checking live SoundCloud playlist for this track...</p></section>';
           window.SaintPlaylist.sync(config.playlistUrl, tracks).then(
             (updated) => {
               const found = (updated || []).find(
@@ -538,7 +538,7 @@
       }
     }
   });
-  if (config.playlistUrl && window.SaintPlaylist?.sync) {
+  if (canSyncPlaylist) {
     setTimeout(() => {
       window.SaintPlaylist.sync(config.playlistUrl, tracks);
     }, 1500);
