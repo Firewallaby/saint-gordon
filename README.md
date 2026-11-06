@@ -4,11 +4,11 @@ A portable, build-free website made with vanilla HTML, CSS and JavaScript. No np
 
 ## Update music automatically — no API key
 
-GitHub Actions checks the public Saint Gordon SoundCloud profile every 30 minutes. It commits catalogue changes and requests a GitHub Pages build when there is a new commit to publish. To check immediately, run **Auto-update SoundCloud Releases** from the repository's **Actions** tab.
+The website checks for public SoundCloud releases when visitors open the homepage, collection or a track page, and again every five minutes while the page is open. The live catalogue is served by a cached endpoint on Vercel and shared by both hosted versions. The repository's saved catalogue is shown immediately and stays available if SoundCloud cannot be reached.
 
 The importer reads the profile's public RSS feed and recent public track listings. Uploads can appear on the site without being added to the Saint Gordon Pieces playlist. The catalogue uses the publication order, preserves older saved entries when they fall out of the feed, and keeps local artwork, notes and stable links. Private tracks and reposts are outside the import. If a source request fails, the previous catalogue stays available.
 
-For a local update, double-click **Update Music.command** or run `python3 scripts/update_soundcloud.py`. It updates the catalogue, `dist/` and the portable ZIP when there are changes. `--check` validates the sources without writing files. Use `--watch` to poll locally, or `bash scripts/install_autoupdater.sh` to install the macOS background service. Local sync writes to the checkout. GitHub Actions handles publishing.
+For a local update, double-click **Update Music.command** or run `python3 scripts/update_soundcloud.py`. It updates the catalogue, `dist/` and the portable ZIP when there are changes. `--check` validates the sources without writing files. Use `--watch` to poll locally, or `bash scripts/install_autoupdater.sh` to install the macOS background service. Local sync refreshes the saved catalogue and is optional for the hosted site.
 
 Edit notes and artwork in `js/tracks.js` using JSON syntax, then rerun the importer. Artist profiles remain in `js/artists.js`.
 

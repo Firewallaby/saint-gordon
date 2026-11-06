@@ -149,7 +149,7 @@ def infer_artist_credits(title, description, local):
     return unique
 
 
-def build():
+def build(*, download_artwork=True):
     saved = assignment((ROOT / 'js/tracks.js').read_text(), 'window.SAINT_TRACKS')
     generated = ROOT / 'js/soundcloud-data.js'
     previous = assignment(generated.read_text(), 'window.SAINT_SYNCED_TRACKS') if generated.exists() else []
@@ -190,17 +190,18 @@ def build():
         if not track.get('artwork') or track.get('artworkPlaceholder'):
             art_url = urllib.parse.urlparse(item['artwork'])
             if art_url.scheme == 'https' and art_url.hostname and art_url.hostname.endswith('.sndcdn.com'):
-                resized = re.sub(r'-(?:t\d+x\d+|large)(\.[a-z]+)$', r'-t500x500\1', item['artwork'])
-                blob = fetch(resized)
-                if blob.startswith(b'\xff\xd8'):
-                    extension = 'jpg'
-                elif blob.startswith(b'\x89PNG\r\n\x1a\n'):
-                    extension = 'png'
-                else:
-                    raise ValueError('SoundCloud returned invalid artwork for ' + title)
-                filename = f'assets/artwork/soundcloud-{track_id}.{extension}'
-                artwork[filename] = blob
-                track.update(artwork=filename, artworkThumb=filename, artworkPlaceholder=False,
+                cover = re.sub(r'-(?:t\d+x\d+|large)(\.[a-z]+)$', r'-t500x500\1', item['artwork'])
+                if download_artwork:
+                    blob = fetch(cover)
+                    if blob.startswith(b'\xff\xd8'):
+                        extension = 'jpg'
+                    elif blob.startswith(b'\x89PNG\r\n\x1a\n'):
+                        extension = 'png'
+                    else:
+                        raise ValueError('SoundCloud returned invalid artwork for ' + title)
+                    cover = f'assets/artwork/soundcloud-{track_id}.{extension}'
+                    artwork[cover] = blob
+                track.update(artwork=cover, artworkThumb=cover, artworkPlaceholder=False,
                              artworkAlt='Cover artwork for ' + title)
             else:
                 track.update(artwork=PLACEHOLDER, artworkThumb=PLACEHOLDER, artworkPlaceholder=True)

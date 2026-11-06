@@ -54,6 +54,32 @@
   const canSyncPlaylist = !publishedTracks && config.playlistUrl && window.SaintPlaylist?.sync;
   const cachedDynamic = canSyncPlaylist ? window.SaintPlaylist.getCached() : null;
   let tracks = prepareTracks(publishedTracks || cachedDynamic || localTracks);
+  const releasesUrl = "https://saintgordon.vercel.app/api/releases";
+  let liveRequest;
+  function refreshReleases() {
+    if (!liveRequest) {
+      liveRequest = fetch(releasesUrl)
+        .then((response) => (response.ok ? response.json() : null))
+        .then((releases) => {
+          if (!Array.isArray(releases) || !releases.length) return tracks;
+          const ids = new Set(tracks.map((track) => track.soundcloudId));
+          const incoming = new Set(releases.map((track) => track.soundcloudId));
+          if (releases.some((track) => !ids.has(track.soundcloudId))) {
+            const updated = [
+              ...releases,
+              ...tracks.filter((track) => !incoming.has(track.soundcloudId)),
+            ];
+            window.dispatchEvent(new CustomEvent("saint:tracks-updated", {
+              detail: { tracks: updated },
+            }));
+          }
+          return tracks;
+        })
+        .catch(() => tracks)
+        .finally(() => { liveRequest = null; });
+    }
+    return liveRequest;
+  }
   document.querySelectorAll("[data-copy]").forEach((node) => {
     const [section, key] = node.dataset.copy.split(".");
     const value = window.SAINT_CONTENT?.[section]?.[key];
@@ -271,7 +297,7 @@
       label: number > 0 ? "FRAGMENT / " + String(number).padStart(3, "0") : "AUDIO DECK",
     });
   }
-  function renderMusic() {
+  function renderMusic(checkLive = true) {
     if (page === "index") {
       const featured = tracks.find((track) => !track.placeholder);
       const host = document.querySelector("#featured");
@@ -345,28 +371,14 @@
       );
       const host = document.querySelector("#song-detail");
       if (!t) {
-        if (canSyncPlaylist) {
+        if (checkLive) {
           document.title = "Locating release — Saint Gordon Collective";
           host.innerHTML =
-            '<section class="error-page"><span class="micro">CONNECTING TRANSMISSION</span><h1>Locating release...</h1><p>Checking live SoundCloud playlist for this track...</p></section>';
-          window.SaintPlaylist.sync(config.playlistUrl, tracks).then(
-            (updated) => {
-              const found = (updated || []).find(
-                (track) =>
-                  track.slug === slug ||
-                  String(track.soundcloudId) === slug ||
-                  track.slug === "soundcloud-" + slug,
-              );
-              if (found) {
-                tracks = prepareTracks(updated);
-                renderMusic();
-              } else {
-                document.title = "Fragment not found — Saint Gordon Collective";
-                host.innerHTML =
-                  '<section class="error-page"><span class="micro">ENTRY NOT FOUND</span><h1>Track not found.</h1><p>The track link is incomplete or no longer belongs to the collection.</p><a class="paper-button" href="collection.html">Return to the Collection</a></section>';
-              }
-            },
-          );
+            '<section class="error-page"><span class="micro">CONNECTING TRANSMISSION</span><h1>Locating release...</h1><p>Checking SoundCloud for this track...</p></section>';
+          const request = canSyncPlaylist
+            ? window.SaintPlaylist.sync(config.playlistUrl, tracks)
+            : refreshReleases();
+          request.then(() => renderMusic(false));
           return;
         }
         document.title = "Fragment not found — Saint Gordon Collective";
@@ -545,6 +557,10 @@
     setInterval(() => {
       window.SaintPlaylist.sync(config.playlistUrl, tracks);
     }, 5 * 60 * 1000);
+  }
+  if (publishedTracks && ["index", "collection", "song"].includes(page)) {
+    setTimeout(refreshReleases, 1500);
+    setInterval(refreshReleases, 5 * 60 * 1000);
   }
   if (page === "manifesto") {
     document.querySelector("#origins").textContent =

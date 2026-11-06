@@ -5,5 +5,5 @@
 .git
 .github
 tests
-scripts
+scripts/install_autoupdater.sh
 Update Music.command
