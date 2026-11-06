@@ -1,0 +1,43 @@
+name: Auto-update SoundCloud Releases
+
+on:
+  schedule:
+    - cron: '13,43 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: soundcloud-autoupdate
+
+jobs:
+  update:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v6
+      - name: Import public releases
+        run: python3 scripts/update_soundcloud.py
+
+      - name: Commit new releases
+        run: |
+          git add -- '*.html' js/soundcloud-data.js assets/artwork dist
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'Sync public SoundCloud releases'
+          git push origin HEAD:main
+
+      - name: Publish to GitHub Pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          endpoint="repos/$GITHUB_REPOSITORY/pages/builds"
+          latest=$(gh api "$endpoint/latest" --jq '[.commit, .status] | join(" ")')
+          head=$(git rev-parse HEAD)
+          if [[ "$GITHUB_EVENT_NAME" == workflow_dispatch || "$latest" != "$head "* || "$latest" == *" errored" ]]; then
+            gh api --method POST "$endpoint" --jq .status
+          fi
